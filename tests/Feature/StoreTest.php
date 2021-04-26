@@ -14,6 +14,10 @@ class StoreTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    /**
+     * @group paginate
+     * @group authentication
+     */
     public function testPaginateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -21,6 +25,10 @@ class StoreTest extends TestCase
             ->assertUnauthorized();
     }
 
+    /**
+     * @group paginate
+     * @group success
+     */
     public function testPaginateSuccess()
     {
         $count = 20;
@@ -36,6 +44,10 @@ class StoreTest extends TestCase
             ->assertJsonPath('last_page', 2);
     }
 
+    /**
+     * @group get
+     * @group authentication
+     */
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -43,16 +55,43 @@ class StoreTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function testGetUnauthorized()
+    /**
+     * @group get
+     * @group authentication
+     */
+    public function testGetAuthorization()
     {
         $store = Store::factory()->create();
-        $user = User::factory()->create(['store_id' => null]);
-        Sanctum::actingAs($user);
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/store/$store->id")
-            ->assertForbidden();
+        $this->assertDatabaseHas(
+            $store->getTable(),
+            $store->only($store->getFillable())
+        );
+        $fn = fn() => $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->get("api/store/$store->id");
+
+        // Employee of other enterprise
+        Sanctum::actingAs(User::factory()->create());
+        $fn()->assertNotFound();
+
+        // Employee of enterprise store
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $store->enterprise_id
+        ]));
+        $fn()->assertForbidden();
+
+        // Employee of enterprise
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $store->enterprise_id,
+            'store_id' => null,
+        ]));
+        $fn()->assertOk();
     }
 
+    /**
+     * @group get
+     * @group success
+     */
     public function testGetSuccess()
     {
         $user = User::factory()
@@ -66,12 +105,20 @@ class StoreTest extends TestCase
             ->assertOk();
     }
 
+    /**
+     * @group create
+     * @group authentication
+     */
     public function testCreateUnauthenticated() {
         $this->withHeaders(['Accept' => 'application/json'])
             ->post("api/store/")
             ->assertUnauthorized();
     }
 
+    /**
+     * @group create
+     * @group success
+     */
     public function testCreateSuccess()
     {
         $user = User::factory()->create(['store_id' => null]);
@@ -84,6 +131,10 @@ class StoreTest extends TestCase
         $this->assertDatabaseHas($store->getTable(), $payload);
     }
 
+    /**
+     * @group update
+     * @group authentication
+     */
     public function testUpdateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -91,21 +142,49 @@ class StoreTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function testUpdateUnauthorized()
+    /**
+     * @group update
+     * @group authorization
+     * @group authentication
+     */
+    public function testUpdateAuthorization()
     {
-        $user = User::factory()->create(['store_id' => null]);
         $store = Store::factory()->create();
-        Sanctum::actingAs($user);
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->put("api/store/$store->id")
-            ->assertForbidden();
+        $this->assertDatabaseHas(
+            $store->getTable(),
+            $store->only($store->getFillable())
+        );
+        $fn = fn() => $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->put("api/store/$store->id");
+
+        // Employee of other enterprise
+        Sanctum::actingAs(User::factory()->create());
+        $fn()->assertNotFound();
+
+        // Employee of enterprise store
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $store->enterprise_id
+        ]));
+        $fn()->assertForbidden();
+
+        // Employee of enterprise
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $store->enterprise_id,
+            'store_id' => null,
+        ]));
+        $fn()->assertOk();
     }
 
+    /**
+     * @group update
+     * @group success
+     */
     public function testUpdateSuccess()
     {
         $user = User::factory()->create(['store_id' => null]);
-        $store = Store::factory()->create(['enterprise_id' => $user->enterprise_id]);
         Sanctum::actingAs($user);
+        $store = Store::factory()->create(['enterprise_id' => $user->enterprise_id]);
         $name = $this->faker->name;
         $this->withHeaders(['Accept' => 'application/json'])
             ->put("api/store/$store->id", ['name' => $name])
@@ -117,6 +196,10 @@ class StoreTest extends TestCase
         ]);
     }
 
+    /**
+     * @group delete
+     * @group authentication
+     */
     public function testDeleteUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -124,21 +207,49 @@ class StoreTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function testDeleteUnauthorized()
+    /**
+     * @group update
+     * @group authorization
+     * @group authentication
+     */
+    public function testDeleteAuthorization()
     {
-        $user = User::factory()->create(['store_id' => null]);
         $store = Store::factory()->create();
-        Sanctum::actingAs($user);
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->delete("api/store/$store->id")
-            ->assertForbidden();
+        $this->assertDatabaseHas(
+            $store->getTable(),
+            $store->only($store->getFillable())
+        );
+        $fn = fn() => $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->put("api/store/$store->id");
+
+        // Employee of other enterprise
+        Sanctum::actingAs(User::factory()->create());
+        $fn()->assertNotFound();
+
+        // Employee of enterprise store
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $store->enterprise_id
+        ]));
+        $fn()->assertForbidden();
+
+        // Employee of enterprise
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $store->enterprise_id,
+            'store_id' => null,
+        ]));
+        $fn()->assertOk();
     }
 
+    /**
+     * @group delete
+     * @group success
+     */
     public function testDeleteSuccess()
     {
         $user = User::factory()->create(['store_id' => null]);
-        $store = Store::factory()->create(['enterprise_id' => $user->enterprise_id]);
         Sanctum::actingAs($user);
+        $store = Store::factory()->create(['enterprise_id' => $user->enterprise_id]);
         $this->withHeaders(['Accept' => 'application/json'])
             ->delete("api/store/$store->id")
             ->assertOk();

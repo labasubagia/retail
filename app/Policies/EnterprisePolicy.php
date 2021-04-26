@@ -27,25 +27,25 @@ class EnterprisePolicy
 
     public function update(User $user, Enterprise $enterprise)
     {
-        return $this->isAllowed($user, $enterprise);
+        return $this->isAllowModify($user, $enterprise);
     }
 
     public function delete(User $user, Enterprise $enterprise)
     {
-        return $this->isAllowed($user, $enterprise);
+        return $this->isAllowModify($user, $enterprise);
     }
 
     public function restore(User $user, Enterprise $enterprise)
     {
-        return $this->isAllowed($user, $enterprise);
+        return $this->isAllowModify($user, $enterprise);
     }
 
     public function forceDelete(User $user, Enterprise $enterprise)
     {
-        return $this->isAllowed($user, $enterprise);
+        return $this->isAllowModify($user, $enterprise);
     }
 
-    private function isAllowed(User $user, Enterprise $enterprise)
+    private function isAllowModify(User $user, Enterprise $enterprise)
     {
         return $user->isNotEmployee;
     }

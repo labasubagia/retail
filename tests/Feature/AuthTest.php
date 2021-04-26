@@ -14,6 +14,11 @@ class AuthTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    /**
+     * @group register
+     * @group validation
+     * @group authentication
+     */
     public function testRegisterValidation()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -22,6 +27,11 @@ class AuthTest extends TestCase
             ->assertJsonValidationErrors(['name', 'email', 'password']);
     }
 
+    /**
+     * @group register
+     * @group success
+     * @group authentication
+     */
     public function testRegisterSuccess()
     {
         $user = User::factory()->make();
@@ -34,6 +44,11 @@ class AuthTest extends TestCase
         $this->assertDatabaseHas($user->getTable(), $payload);
     }
 
+    /**
+     * @group login
+     * @group authentication
+     * @group failed
+     */
     public function testLoginFailed()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -45,6 +60,11 @@ class AuthTest extends TestCase
             ->assertJsonPath('token', null);
     }
 
+    /**
+     * @group login
+     * @group authentication
+     * @group success
+     */
     public function testLoginSuccess()
     {
         $password = '12345678';
@@ -58,6 +78,10 @@ class AuthTest extends TestCase
             ->assertJsonPath('token', $user->currentAccessToken());
     }
 
+    /**
+     * @group logout
+     * @group authentication
+     */
     public function testLogoutUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -65,6 +89,11 @@ class AuthTest extends TestCase
             ->assertUnauthorized();
     }
 
+    /**
+     * @group logout
+     * @group authentication
+     * @group success
+     */
     public function testLogoutSuccess()
     {
         $user = User::factory()->create();

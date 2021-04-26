@@ -12,9 +12,7 @@ class VendorPolicy
 
     public function viewAny(User $user)
     {
-        return $user->isNotEmployee
-            || $user->isOnlyEnterpriseEmployee
-            || $user->isStoreEmployee;
+        return $user->isNotEmployee || $user->isOnlyEnterpriseEmployee || $user->isStoreEmployee;
     }
 
     public function view(User $user, Vendor $vendor)
@@ -29,28 +27,27 @@ class VendorPolicy
 
     public function update(User $user, Vendor $vendor)
     {
-        return $this->isAllowed($user, $vendor);
+        return $this->isAllowModify($user, $vendor);
     }
 
     public function delete(User $user, Vendor $vendor)
     {
-        return $this->isAllowed($user, $vendor);
+        return $this->isAllowModify($user, $vendor);
     }
 
     public function restore(User $user, Vendor $vendor)
     {
-        return $this->isAllowed($user, $vendor);
+        return $this->isAllowModify($user, $vendor);
     }
 
     public function forceDelete(User $user, Vendor $vendor)
     {
-        return $this->isAllowed($user, $vendor);
+        return $this->isAllowModify($user, $vendor);
     }
 
-    private function isAllowed(User $user, Vendor $vendor)
+    private function isAllowModify(User $user, Vendor $vendor)
     {
-        return $user->isOnlyEnterpriseEmployee
-            && $this->isEnterprise($user, $vendor);
+        return $user->isOnlyEnterpriseEmployee && $this->isEnterprise($user, $vendor);
     }
 
     private function isEnterprise(User $user, Vendor $vendor)

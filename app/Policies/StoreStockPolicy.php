@@ -18,10 +18,10 @@ class StoreStockPolicy
 
     public function update(User $user, StoreStock $storeStock)
     {
-        return $this->isAllowed($user, $storeStock);
+        return $this->isAllowModify($user, $storeStock);
     }
 
-    private function isAllowed(User $user, StoreStock $storeStock)
+    private function isAllowModify(User $user, StoreStock $storeStock)
     {
         return $this->isStore($user, $storeStock)
             && $user->isStoreEmployee;

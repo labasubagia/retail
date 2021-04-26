@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\EnterpriseScope;
+use Auth;
 
 class Product extends Model
 {
@@ -21,6 +23,11 @@ class Product extends Model
     protected $casts = [
         'price' => 'integer',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new EnterpriseScope);
+    }
 
     public function enterprise()
     {
@@ -47,18 +54,16 @@ class Product extends Model
         return $this->hasMany(StoreStock::class);
     }
 
-    public function scopeOfEnterprise($query, User $user)
-    {
-        if (!$user->enterprise_id) return $query;
-        $product = $this->getTable();
-        return $query->where("$product.enterprise_id", $user->enterprise_id);
-    }
-
     public function scopeStock($query)
     {
         $product = $this->getTable();
         $stock = (new StoreStock)->getTable();
+        $user = Auth::user();
         return $query
+            ->withoutGlobalScope(EnterpriseScope::class)
+            ->when($user, fn($q) =>
+                $q->where("$product.enterprise_id", $user->enterprise_id)
+            )
             ->select(
                 "$product.*",
                 "$stock.stock",

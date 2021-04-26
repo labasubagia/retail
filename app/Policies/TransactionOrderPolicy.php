@@ -12,9 +12,7 @@ class TransactionOrderPolicy
 
     public function viewAny(User $user)
     {
-        return $user->isNotEmployee
-            || $user->isOnlyEnterpriseEmployee
-            || $user->isStoreEmployee;
+        return $user->isNotEmployee || $user->isOnlyEnterpriseEmployee || $user->isStoreEmployee;
     }
 
     public function view(User $user, TransactionOrder $transactionOrder)

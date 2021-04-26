@@ -53,9 +53,14 @@ class User extends Authenticatable
         return $this->belongsTo(Store::class);
     }
 
-    public function scopeOfEnterprise($query, User $user)
+    public function scopeEnterprise($query)
     {
-        return $query->where('enterprise_id', $user->enterprise_id);
+        return $query->where($this->only('enterprise_id'));
+    }
+
+    public function scopeStore($query)
+    {
+        return $query->where($this->only('enterprise_id', 'store_id'));
     }
 
     public function getIsNotEmployeeAttribute()

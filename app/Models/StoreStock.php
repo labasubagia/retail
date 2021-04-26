@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\StoreScope;
 
 class StoreStock extends Model
 {
@@ -21,6 +22,11 @@ class StoreStock extends Model
         'product_id' => 'integer',
     ];
 
+    protected static function booted()
+    {
+        static::addGlobalScope(new StoreScope);
+    }
+
     public function enterprise()
     {
         return $this->belongsTo(Enterprise::class);
@@ -36,16 +42,4 @@ class StoreStock extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function scopeOfEnterprise($query, User $user)
-    {
-        return $query->where('enterprise_id', $user->enterprise_id);
-    }
-
-    public function scopeOfStore($query, User $user)
-    {
-        $stock = $this->getTable();
-        return $query
-            ->where("$stock.enterprise_id", $user->enterprise_id)
-            ->where("$stock.store_id", $user->store_id);
-    }
 }

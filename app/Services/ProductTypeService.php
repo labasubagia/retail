@@ -16,9 +16,7 @@ class ProductTypeService
 
     public function paginate(Request $request)
     {
-        return $this->productTypeModel
-            ->ofEnterprise($request->user())
-            ->paginate($request->get('per_page', 10));
+        return $this->productTypeModel->paginate($request->get('per_page', 10));
     }
 
     public function get(Request $request, ProductType $data)

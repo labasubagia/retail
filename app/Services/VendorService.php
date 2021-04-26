@@ -16,9 +16,7 @@ class VendorService
 
     public function paginate(Request $request)
     {
-        return $this->vendorModel
-            ->ofEnterprise($request->user())
-            ->paginate($request->get('per_page', 10));
+        return $this->vendorModel->paginate($request->get('per_page', 10));
     }
 
     public function get(Request $request, Vendor $data)

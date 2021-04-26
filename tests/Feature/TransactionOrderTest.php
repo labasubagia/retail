@@ -17,6 +17,10 @@ class TransactionOrderTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    /**
+     * @group paginate
+     * @group authentication
+     */
     public function testPaginateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -24,6 +28,10 @@ class TransactionOrderTest extends TestCase
             ->assertUnauthorized();
     }
 
+    /**
+     * @group paginate
+     * @group success
+     */
     public function testPaginateSuccess()
     {
         $count = 20;
@@ -41,6 +49,10 @@ class TransactionOrderTest extends TestCase
             ->assertJsonPath('last_page', 2);
     }
 
+    /**
+     * @group get
+     * @group authentication
+     */
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -48,16 +60,45 @@ class TransactionOrderTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function testGetUnauthorized()
+    /**
+     * @group get
+     * @group authorization
+     * @group authentication
+     */
+    public function testGetAuthorization()
     {
         $order = TransactionOrder::factory()->create();
-        $user = User::factory()->create();
-        Sanctum::actingAs($user);
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/order/$order->id")
-            ->assertForbidden();
+        $this->assertDatabaseHas(
+            $order->getTable(),
+            $order->only($order->getFillable())
+        );
+        $fn = fn() => $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->get("api/order/$order->id");
+
+        // Employee of other enterprise
+        Sanctum::actingAs(User::factory()->create());
+        $fn()->assertNotFound();
+
+        // Employee of enterprise
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $order->enterprise_id,
+            'store_id' => null,
+        ]));
+        $fn()->assertNotFound();
+
+        // Employee of enterprise store
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $order->enterprise_id,
+            'store_id' => $order->store_id,
+        ]));
+        $fn()->assertOk();
     }
 
+    /**
+     * @group get
+     * @group success
+     */
     public function testGetSuccess()
     {
         $user = User::factory()->create();
@@ -78,7 +119,12 @@ class TransactionOrderTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function testCreateUnauthorized() {
+    /**
+     * @group create
+     * @group authorization
+     * @group authentication
+     */
+    public function testCreateAuthorization() {
         // Not Employee
         Sanctum::actingAs(User::factory()->create(['enterprise_id' => null,'store_id' => null]));
         $this->withHeaders(['Accept' => 'application/json'])
@@ -92,13 +138,17 @@ class TransactionOrderTest extends TestCase
             ->assertForbidden();
     }
 
+    /**
+     * @group create
+     * @group success
+     */
     public function testCreateSuccess()
     {
         $user = User::factory()->create();
+        Sanctum::actingAs($user);
         $enterprisePayload = $user->only('enterprise_id');
         $storePayload = $user->only('enterprise_id', 'store_id');
         $employeePayload = array_merge($storePayload, ['user_id' => $user->id]);
-        Sanctum::actingAs($user);
 
         // Make data
         $stock = $this->faker->numberBetween(10, 50);
@@ -118,8 +168,8 @@ class TransactionOrderTest extends TestCase
         // Send Request
         $payload = $product->map(fn($p) => ['product_id' => $p->id, 'amount' => $buy])->toArray();
         $response = $this->withHeaders(['Accept' => 'application/json'])->post("api/order/", $payload);
-        $response->assertCreated();
         $result = collect(json_decode($response->getContent()))->except('trace');
+        $response->assertCreated();
 
         // Check Stock
         $stocks = StoreStock::whereIn('id', $stocks->pluck('id'))->get();

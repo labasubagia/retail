@@ -17,6 +17,10 @@ class ProductTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    /**
+     * @group paginate
+     * @group authentication
+     */
     public function testPaginateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -24,6 +28,10 @@ class ProductTest extends TestCase
             ->assertUnauthorized();
     }
 
+    /**
+     * @group paginate
+     * @group success
+     */
     public function testPaginateSuccess()
     {
         $count = 20;
@@ -31,14 +39,20 @@ class ProductTest extends TestCase
             ->for(Enterprise::factory()->has(Product::factory($count), 'products'))
             ->create(['store_id' => null]);
         Sanctum::actingAs($user);
-
         $this->assertDatabaseCount((new Product)->getTable(), $count);
-        $response =$this->withHeaders(['Accept' => 'application/json'])
-            ->get('/api/product', ['per_page' => 10])
+        $response = $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->get('/api/product', ['per_page' => 10]);
+        $response
             ->assertOk()
             ->assertJsonPath('last_page', 2);
+        $result = collect(json_decode($response->getContent()))->except('trace');
     }
 
+    /**
+     * @group get
+     * @group authentication
+     */
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -46,23 +60,44 @@ class ProductTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function testGetUnauthorized()
+    /**
+     * @group get
+     * @group authorization
+     * @group authentication
+     */
+    public function testGetAuthorization()
     {
         $product = Product::factory()->create();
-        $user = User::factory()->create(['store_id' => null]);
-        Sanctum::actingAs($user);
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/product/$product->id")
-            ->assertForbidden();
+        $this->assertDatabaseHas(
+            $product->getTable(),
+            $product->only($product->getFillable())
+        );
+        $fn = fn() => $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->get("api/product/$product->id");
+
+        // Employee of this enterprise
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $product->enterprise_id,
+            'store_id' => null
+        ]));
+        $fn()->assertOk();
+
+        // Employee of other enterprise
+        Sanctum::actingAs(User::factory()->create());
+        $fn()->assertNotFound();
     }
 
+    /**
+     * @group get
+     * @group success
+     */
     public function testGetSuccess()
     {
         $user = User::factory()
             ->for(Enterprise::factory()->has(Product::factory(), 'products'))
             ->create(['store_id' => null]);
         Sanctum::actingAs($user);
-
         $product = $user->enterprise->Products->first();
         $this->withHeaders(['Accept' => 'application/json'])
             ->get("api/product/$product->id")
@@ -70,12 +105,20 @@ class ProductTest extends TestCase
             ->assertOk();
     }
 
+    /**
+     * @group create
+     * @group authentication
+     */
     public function testCreateUnauthenticated() {
         $this->withHeaders(['Accept' => 'application/json'])
             ->post("api/product/")
             ->assertUnauthorized();
     }
 
+    /**
+     * @group create
+     * @group success
+     */
     public function testCreateSuccess()
     {
         $user = User::factory()->create(['store_id' => null]);
@@ -90,6 +133,10 @@ class ProductTest extends TestCase
         $this->assertDatabaseHas($product->getTable(), $payload);
     }
 
+    /**
+     * @group update
+     * @group authentication
+     */
     public function testUpdateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -97,21 +144,50 @@ class ProductTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function testUpdateUnauthorized()
+    /**
+     * @group update
+     * @group authorization
+     * @group authentication
+     */
+    public function testUpdateAuthorization()
     {
-        $user = User::factory()->create(['store_id' => null]);
         $product = Product::factory()->create();
-        Sanctum::actingAs($user);
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->put("api/product/$product->id", ['name' => $this->faker->name])
-            ->assertForbidden();
+        $this->assertDatabaseHas(
+            $product->getTable(),
+            $product->only($product->getFillable())
+        );
+        $payload = ['name' => $this->faker->name];
+        $fn = fn() => $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->put("api/product/$product->id", $payload);
+
+        // Employee of other enterprise
+        Sanctum::actingAs(User::factory()->create());
+        $fn()->assertNotFound();
+
+        // Employee of enterprise store
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $product->enterprise_id,
+        ]));
+        $fn()->assertForbidden();
+
+        // Employee of enterprise
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $product->enterprise_id,
+            'store_id' => null
+        ]));
+        $fn()->assertOk();
     }
 
+    /**
+     * @group update
+     * @group success
+     */
     public function testUpdateSuccess()
     {
         $user = User::factory()->create(['store_id' => null]);
-        $product = Product::factory()->create(['enterprise_id' => $user->enterprise_id]);
         Sanctum::actingAs($user);
+        $product = Product::factory()->create(['enterprise_id' => $user->enterprise_id]);
         $name = $this->faker->name;
         $this->withHeaders(['Accept' => 'application/json'])
             ->put("api/product/$product->id", ['name' => $name])
@@ -123,6 +199,10 @@ class ProductTest extends TestCase
         ]);
     }
 
+    /**
+     * @group delete
+     * @group authentication
+     */
     public function testDeleteUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
@@ -130,21 +210,49 @@ class ProductTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function testDeleteUnauthorized()
+    /**
+     * @group delete
+     * @group authorization
+     * @group authentication
+     */
+    public function testDeleteAuthorization()
     {
-        $user = User::factory()->create(['store_id' => null]);
         $product = Product::factory()->create();
-        Sanctum::actingAs($user);
-        $this->withHeaders(['Accept' => 'application/json'])
-            ->delete("api/product/$product->id")
-            ->assertForbidden();
+        $this->assertDatabaseHas(
+            $product->getTable(),
+            $product->only($product->getFillable())
+        );
+        $fn = fn() => $this
+            ->withHeaders(['Accept' => 'application/json'])
+            ->delete("api/product/$product->id");
+
+        // Employee of other enterprise
+        Sanctum::actingAs(User::factory()->create());
+        $fn()->assertNotFound();
+
+        // Employee of enterprise store
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $product->enterprise_id,
+        ]));
+        $fn()->assertForbidden();
+
+        // Employee of enterprise
+        Sanctum::actingAs(User::factory()->create([
+            'enterprise_id' => $product->enterprise_id,
+            'store_id' => null
+        ]));
+        $fn()->assertOk();
     }
 
+    /**
+     * @group delete
+     * @group success
+     */
     public function testDeleteSuccess()
     {
         $user = User::factory()->create(['store_id' => null]);
-        $product = Product::factory()->create(['enterprise_id' => $user->enterprise_id]);
         Sanctum::actingAs($user);
+        $product = Product::factory()->create(['enterprise_id' => $user->enterprise_id]);
         $this->withHeaders(['Accept' => 'application/json'])
             ->delete("api/product/$product->id")
             ->assertOk();

@@ -17,7 +17,7 @@ class StorePolicy
 
     public function view(User $user, Store $store)
     {
-        return $user->isNotEmployee || $this->isAllowed($user, $store);
+        return $user->isNotEmployee || $this->isAllowModify($user, $store);
     }
 
     public function create(User $user)
@@ -27,25 +27,25 @@ class StorePolicy
 
     public function update(User $user, Store $store)
     {
-        return $this->isAllowed($user, $store);
+        return $this->isAllowModify($user, $store);
     }
 
     public function delete(User $user, Store $store)
     {
-        return $this->isAllowed($user, $store);
+        return $this->isAllowModify($user, $store);
     }
 
     public function restore(User $user, Store $store)
     {
-        return $this->isAllowed($user, $store);
+        return $this->isAllowModify($user, $store);
     }
 
     public function forceDelete(User $user, Store $store)
     {
-        return $this->isAllowed($user, $store);
+        return $this->isAllowModify($user, $store);
     }
 
-    private function isAllowed(User $user, Store $store)
+    private function isAllowModify(User $user, Store $store)
     {
         return $user->isOnlyEnterpriseEmployee
             && $this->isEnterprise($user, $store);

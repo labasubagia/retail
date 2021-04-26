@@ -16,17 +16,13 @@ class ProductService
 
     public function paginate(Request $request)
     {
-        return $this->productModel
-            ->ofEnterprise($request->user())
-            ->stock()
-            ->paginate($request->get('per_page', 10));
+        return $this->productModel->stock()->paginate($request->get('per_page', 10));
     }
 
     public function get(Request $request, Product $data)
     {
         return $this->productModel
             ->where('products.id', $data->id)
-            ->ofEnterprise($request->user())
             ->stock()
             ->first();
     }

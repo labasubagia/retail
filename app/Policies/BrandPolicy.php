@@ -12,14 +12,12 @@ class BrandPolicy
 
     public function viewAny(User $user)
     {
-        return $user->isNotEmployee
-            || $user->isOnlyEnterpriseEmployee
-            || $user->isStoreEmployee;
+        return $user->isNotEmployee || $user->isOnlyEnterpriseEmployee || $user->isStoreEmployee;
     }
 
     public function view(User $user, Brand $brand)
     {
-        return $user->isNotEmployee || $this->isEnterprise($user, $brand);
+        return $this->isEnterprise($user, $brand);
     }
 
     public function create(User $user)
@@ -29,28 +27,27 @@ class BrandPolicy
 
     public function update(User $user, Brand $brand)
     {
-        return $this->isAllowed($user, $brand);
+        return $this->isAllowModify($user, $brand);
     }
 
     public function delete(User $user, Brand $brand)
     {
-        return $this->isAllowed($user, $brand);
+        return $this->isAllowModify($user, $brand);
     }
 
     public function restore(User $user, Brand $brand)
     {
-        return $this->isAllowed($user, $brand);
+        return $this->isAllowModify($user, $brand);
     }
 
     public function forceDelete(User $user, Brand $brand)
     {
-        return $this->isAllowed($user, $brand);
+        return $this->isAllowModify($user, $brand);
     }
 
-    private function isAllowed(User $user, Brand $brand)
+    private function isAllowModify(User $user, Brand $brand)
     {
-        return $user->isOnlyEnterpriseEmployee
-            && $this->isEnterprise($user, $brand);
+        return $user->isOnlyEnterpriseEmployee && $this->isEnterprise($user, $brand);
     }
 
     private function isEnterprise(User $user, Brand $brand)

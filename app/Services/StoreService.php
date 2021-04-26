@@ -16,9 +16,7 @@ class StoreService
 
     public function paginate(Request $request)
     {
-        return $this->storeModel
-            ->ofEnterprise($request->user())
-            ->paginate($request->get('per_page', 10));
+        return $this->storeModel->paginate($request->get('per_page', 10));
     }
 
     public function get(Request $request, Store $data)

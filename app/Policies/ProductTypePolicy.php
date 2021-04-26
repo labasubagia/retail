@@ -12,9 +12,7 @@ class ProductTypePolicy
 
     public function viewAny(User $user)
     {
-        return $user->isNotEmployee
-            || $user->isOnlyEnterpriseEmployee
-            || $user->isStoreEmployee;
+        return $user->isNotEmployee || $user->isOnlyEnterpriseEmployee || $user->isStoreEmployee;
     }
 
     public function view(User $user, ProductType $productType)
@@ -29,25 +27,25 @@ class ProductTypePolicy
 
     public function update(User $user, ProductType $productType)
     {
-        return $this->isAllowed($user, $productType);
+        return $this->isAllowModify($user, $productType);
     }
 
     public function delete(User $user, ProductType $productType)
     {
-        return $this->isAllowed($user, $productType);
+        return $this->isAllowModify($user, $productType);
     }
 
     public function restore(User $user, ProductType $productType)
     {
-        return $this->isAllowed($user, $productType);
+        return $this->isAllowModify($user, $productType);
     }
 
     public function forceDelete(User $user, ProductType $productType)
     {
-        return $this->isAllowed($user, $productType);
+        return $this->isAllowModify($user, $productType);
     }
 
-    private function isAllowed(User $user, ProductType $productType)
+    private function isAllowModify(User $user, ProductType $productType)
     {
         return $user->isOnlyEnterpriseEmployee
             && $this->isEnterprise($user, $productType);

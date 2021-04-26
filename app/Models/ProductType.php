@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\EnterpriseScope;
 
 class ProductType extends Model
 {
@@ -14,13 +15,13 @@ class ProductType extends Model
         'name',
     ];
 
+    protected static function booted()
+    {
+        static::addGlobalScope(new EnterpriseScope);
+    }
+
     public function enterprise()
     {
         return $this->belongsTo(Enterprise::class);
-    }
-
-    public function scopeOfEnterprise($query, User $user)
-    {
-        return $query->where('enterprise_id', $user->enterprise_id);
     }
 }

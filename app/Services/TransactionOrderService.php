@@ -6,6 +6,8 @@ use App\Models\TransactionOrder;
 use App\Models\TransactionOrderItem;
 use App\Models\StoreStock;
 use App\Models\Product;
+use App\Scopes\StoreScope;
+use App\Scopes\EnterpriseScope;
 use App\Http\Requests\TransactionOrderCreateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,22 +30,13 @@ class TransactionOrderService
 
     public function paginate(Request $request)
     {
-        $user = $request->user();
-        return $this->orderModel
-            ->when($user->isOnlyEnterpriseEmployee, fn($q) => $q->ofEnterprise($user))
-            ->when($user->isStoreEmployee, fn($q) => $q->ofStore($user))
-            ->paginate($request->get('per_page', 10));
+        return $this->orderModel->paginate($request->get('per_page', 10));
     }
 
     public function get(Request $request, TransactionOrder $data)
     {
         if (!$data) return null;
-        $user = $request->user();
-        return $this->orderModel
-            ->when($user->isOnlyEnterpriseEmployee, fn($q) => $q->ofEnterprise($user))
-            ->when($user->isStoreEmployee, fn($q) => $q->ofStore($user))
-            ->where('transaction_orders.id', $data->id)
-            ->first();
+        return $this->orderModel->where('transaction_orders.id', $data->id)->first();
     }
 
     public function create(TransactionOrderCreateRequest $request)
@@ -119,6 +112,8 @@ class TransactionOrderService
     {
         $productIds = $request->only('*.product_id')['*']['product_id'];
         return $this->productModel
+            ->withoutGlobalScope(EnterpriseScope::class)
+            ->where('products.enterprise_id', $request->user()->enterprise_id)
             ->whereIn('products.id', $productIds)
             ->leftJoin('store_stocks', 'store_stocks.product_id', 'products.id')
             ->select(
@@ -135,11 +130,14 @@ class TransactionOrderService
     // not used due to sqlite does not support right join when testing
     private function getProductUsingStock(TransactionOrderCreateRequest $request)
     {
+        $user = $request->user();
         $productIds = $request->only('*.product_id')['*']['product_id'];
         return $this->stockModel
+            ->withoutGlobalScope(StoreScope::class)
+            ->where('products.enterprise_id', $user->enterprise_id)
+            ->where('products.store_id', $user->store_id)
             ->whereIn('products.id', $productIds)
             ->rightJoin('products', 'products.id', 'store_stocks.product_id')
-            ->ofStore($request->user())
             ->distinct('products.id')
             ->select(
                 'products.*',

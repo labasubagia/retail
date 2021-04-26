@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\StoreScope;
 
 class TransactionOrder extends Model
 {
@@ -19,6 +20,11 @@ class TransactionOrder extends Model
     protected $casts = [
         'total' => 'integer',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new StoreScope);
+    }
 
     public function enterprise()
     {
@@ -38,17 +44,5 @@ class TransactionOrder extends Model
     public function items()
     {
         return $this->hasMany(TransactionOrderItem::class);
-    }
-
-    public function scopeOfEnterprise($query, User $user)
-    {
-        return $query->where('enterprise_id', $user->enterprise_id);
-    }
-
-    public function scopeOfStore($query, User $user)
-    {
-        return $query
-            ->where('enterprise_id', $user->enterprise_id)
-            ->where('store_id', $user->store_id);
     }
 }
