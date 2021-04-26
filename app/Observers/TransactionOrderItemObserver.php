@@ -3,29 +3,20 @@
 namespace App\Observers;
 
 use App\Models\TransactionOrderItem;
-use App\Models\StoreStock;
+use App\Services\TransactionOrderItemService;
 use Illuminate\Support\Arr;
 
 class TransactionOrderItemObserver
 {
     public $afterCommit = true;
 
-    public function __construct(StoreStock $stockModel)
+    public function __construct(TransactionOrderItemService $itemService)
     {
-        $this->stockModel = $stockModel;
+        $this->itemService = $itemService;
     }
 
     public function created(TransactionOrderItem $transactionOrderItem)
     {
-        $this->subtractStock($transactionOrderItem);
-    }
-
-    private function subtractStock(TransactionOrderItem $transactionOrderItem)
-    {
-        $filter = $transactionOrderItem->only(['enterprise_id', 'store_id', 'product_id']);
-        $amount =  (int)$transactionOrderItem->amount;
-        $stock = $this->stockModel->where($filter)->where('stock', '>=', $amount)->first();
-        if (!$stock) return;
-        $stock->decrement('stock', $amount);
+        $this->itemService->subtractStock($transactionOrderItem);
     }
 }
