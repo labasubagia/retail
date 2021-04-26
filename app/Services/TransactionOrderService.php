@@ -59,12 +59,6 @@ class TransactionOrderService
                 'total' => $payload->get('total'),
             ]);
             $order->items()->saveMany($payload->get('items'));
-            $this->stockModel->upsert(
-                $payload->get('stocks')->toArray(),
-                // ['product_id', 'enterprise_id', 'store_id'],
-                ['id'],
-                ['stock']
-            );
             DB::commit();
             return $order;
         } catch (Exception $e) {
@@ -77,7 +71,6 @@ class TransactionOrderService
         $user = $request->user();
         $products = $this->getProducts($request);
 
-        $stocks = collect([]);
         $items = collect([]);
         $error = [];
         $total = 0;
@@ -114,22 +107,12 @@ class TransactionOrderService
                 'amount' => $amount,
                 'subtotal' => $subtotal,
             ]));
-
-            // Payload Update Store Stock
-            $stock = $product;
-            $stock->stock -= $amount;
-            $stock = Arr::only(
-                $stock->toArray(),
-                $this->stockModel->getFillable(),
-            );
-            $stock = Arr::add($stock,'id', $product->stock_id);
-            $stocks->push($stock);
         }
 
         // Validate
         if ($error) throw ValidationException::withMessages($error);
 
-        return collect(['items' => $items, 'stocks' => $stocks, 'total' => $total]);
+        return collect(['items' => $items, 'total' => $total]);
     }
 
     private function getProducts(TransactionOrderCreateRequest $request)
