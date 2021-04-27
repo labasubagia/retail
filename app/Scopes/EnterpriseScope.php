@@ -13,6 +13,7 @@ class EnterpriseScope implements Scope
     public function apply(Builder $builder, Model $model)
     {
         $user = Auth::user();
-        $builder->where($user->only('enterprise_id'));
+        $table = $model->getTable();
+        $builder->where("$table.enterprise_id", $user->enterprise_id);
     }
 }

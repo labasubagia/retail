@@ -13,6 +13,9 @@ class StoreScope implements Scope
     public function apply(Builder $builder, Model $model)
     {
         $user = Auth::user();
-        $builder->where($user->only('enterprise_id', 'store_id'));
+        $table = $model->getTable();
+        $builder
+            ->where("$table.enterprise_id", $user->enterprise_id)
+            ->where("$table.store_id", $user->store_id);
     }
 }

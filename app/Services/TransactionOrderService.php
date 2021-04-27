@@ -112,8 +112,6 @@ class TransactionOrderService
     {
         $productIds = $request->only('*.product_id')['*']['product_id'];
         return $this->productModel
-            ->withoutGlobalScope(EnterpriseScope::class)
-            ->where('products.enterprise_id', $request->user()->enterprise_id)
             ->whereIn('products.id', $productIds)
             ->leftJoin('store_stocks', 'store_stocks.product_id', 'products.id')
             ->select(
@@ -133,9 +131,6 @@ class TransactionOrderService
         $user = $request->user();
         $productIds = $request->only('*.product_id')['*']['product_id'];
         return $this->stockModel
-            ->withoutGlobalScope(StoreScope::class)
-            ->where('products.enterprise_id', $user->enterprise_id)
-            ->where('products.store_id', $user->store_id)
             ->whereIn('products.id', $productIds)
             ->rightJoin('products', 'products.id', 'store_stocks.product_id')
             ->distinct('products.id')

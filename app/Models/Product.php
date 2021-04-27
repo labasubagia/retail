@@ -60,10 +60,6 @@ class Product extends Model
         $stock = (new StoreStock)->getTable();
         $user = Auth::user();
         return $query
-            ->withoutGlobalScope(EnterpriseScope::class)
-            ->when($user, fn($q) =>
-                $q->where("$product.enterprise_id", $user->enterprise_id)
-            )
             ->select(
                 "$product.*",
                 "$stock.stock",
