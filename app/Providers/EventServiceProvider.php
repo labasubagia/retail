@@ -6,8 +6,8 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
-use App\Models\TransactionOrderItem;
-use App\Observers\TransactionOrderItemObserver;
+use App\Models\OrderItem;
+use App\Observers\OrderItemObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -29,6 +29,6 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        TransactionOrderItem::observe(TransactionOrderItemObserver::class);
+        OrderItem::observe(OrderItemObserver::class);
     }
 }

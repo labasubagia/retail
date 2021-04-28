@@ -3,9 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\TransactionOrder;
+use App\Models\Order;
 
-class TransactionOrderCreateRequest extends FormRequest
+class OrderCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class TransactionOrderCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->can('create', TransactionOrder::class);
+        return $this->user()->can('create', Order::class);
     }
 
     /**

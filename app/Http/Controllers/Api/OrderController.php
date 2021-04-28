@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\TransactionOrderCreateRequest;
-use App\Models\TransactionOrder;
-use App\Services\TransactionOrderService;
+use App\Http\Requests\OrderCreateRequest;
+use App\Models\Order;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
 
-class TransactionOrderController extends Controller
+class OrderController extends Controller
 {
-    public function __construct(TransactionOrderService $service)
+    public function __construct(OrderService $service)
     {
-        $this->authorizeResource(TransactionOrder::class, 'order');
+        $this->authorizeResource(Order::class, 'order');
         $this->service = $service;
     }
 
@@ -22,13 +22,13 @@ class TransactionOrderController extends Controller
         return response()->json($result);
     }
 
-    public function store(TransactionOrderCreateRequest $request)
+    public function store(OrderCreateRequest $request)
     {
         $result = $this->service->create($request);
         return response()->json($result, 201);
     }
 
-    public function show(Request $request, TransactionOrder $order)
+    public function show(Request $request, Order $order)
     {
         $result = $this->service->get($request, $order);
         return response()->json($result);

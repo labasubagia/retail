@@ -11,8 +11,8 @@ use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Store;
 use App\Models\StoreStock;
-use App\Models\TransactionOrder;
-use App\Models\TransactionOrderItem;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Support\Arr;
@@ -79,11 +79,11 @@ class DatabaseSeeder extends Seeder
                             ))
                         );
 
-                        TransactionOrder::factory(10)
+                        Order::factory(10)
                             ->state(new Sequence(fn() => ['user_id' => $users->random()->id]))
                             ->create($payload)
                             ->each(function ($order) use ($products) {
-                                TransactionOrderItem::factory()
+                                OrderItem::factory()
                                     ->state(new Sequence(fn() => [
                                         'product_id' => $products->random()->id
                                     ]))
@@ -91,7 +91,7 @@ class DatabaseSeeder extends Seeder
                                         'enterprise_id' => $order->enterprise_id,
                                         'store_id' => $order->store_id,
                                         'user_id' => $order->user_id,
-                                        'transaction_order_id' => $order->id,
+                                        'order_id' => $order->id,
                                     ]);
                             });
                     });

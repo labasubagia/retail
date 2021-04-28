@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Scopes\StoreScope;
 
-class TransactionOrder extends Model
+class Order extends Model
 {
     use HasFactory;
 
@@ -43,6 +43,6 @@ class TransactionOrder extends Model
 
     public function items()
     {
-        return $this->hasMany(TransactionOrderItem::class);
+        return $this->hasMany(OrderItem::class);
     }
 }

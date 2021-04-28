@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\TransactionOrder;
-use App\Models\TransactionOrderItem;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\User;
 use App\Models\Enterprise;
 use App\Models\Product;
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-class TransactionOrderTest extends TestCase
+class OrderTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
@@ -38,11 +38,11 @@ class TransactionOrderTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
         $storePayload = $user->only('enterprise_id', 'store_id');
-        TransactionOrder::factory($count)->create(
+        Order::factory($count)->create(
             array_merge($storePayload, ['user_id' => $user->id])
         );
 
-        $this->assertDatabaseCount((new TransactionOrder)->getTable(), $count);
+        $this->assertDatabaseCount((new Order)->getTable(), $count);
         $this->withHeaders(['Accept' => 'application/json'])
             ->get('/api/order', ['per_page' => 10])
             ->assertOk()
@@ -67,7 +67,7 @@ class TransactionOrderTest extends TestCase
      */
     public function testGetAuthorization()
     {
-        $order = TransactionOrder::factory()->create();
+        $order = Order::factory()->create();
         $this->assertDatabaseHas(
             $order->getTable(),
             $order->only($order->getFillable())
@@ -104,7 +104,7 @@ class TransactionOrderTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
         $storePayload = $user->only('enterprise_id', 'store_id');
-        $order = TransactionOrder::factory()->create(
+        $order = Order::factory()->create(
             array_merge($storePayload, ['user_id' => $user->id])
         );
         $this->withHeaders(['Accept' => 'application/json'])
@@ -178,10 +178,10 @@ class TransactionOrderTest extends TestCase
         $this->assertDatabaseCount((new StoreStock)->getTable(), $count);
 
         // Check Database
-        $this->assertDatabaseHas((new TransactionOrder)->getTable(), [
+        $this->assertDatabaseHas((new Order)->getTable(), [
             'id' => $result->get('id'),
             'total' => $result->get('total')
         ]);
-        $this->assertDatabaseCount((new TransactionOrderItem)->getTable(), count($stocks));
+        $this->assertDatabaseCount((new OrderItem)->getTable(), count($stocks));
     }
 }

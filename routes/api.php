@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\EnterpriseController;
 use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\StoreStockController;
-use App\Http\Controllers\Api\TransactionOrderController;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +44,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['prefix' => 'store-stock'], function() {
         Route::post('/{store_stock?}', [StoreStockController::class, 'upsert']);
     });
-    Route::apiResource('order', TransactionOrderController::class)->only('index', 'show', 'store');
+    Route::apiResource('order', OrderController::class)->only('index', 'show', 'store');
 });
 

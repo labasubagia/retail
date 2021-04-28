@@ -2,23 +2,23 @@
 
 namespace App\Services;
 
-use App\Models\TransactionOrder;
-use App\Models\TransactionOrderItem;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\StoreStock;
 use App\Models\Product;
 use App\Scopes\StoreScope;
 use App\Scopes\EnterpriseScope;
-use App\Http\Requests\TransactionOrderCreateRequest;
+use App\Http\Requests\OrderCreateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Arr;
 use Exception;
 
-class TransactionOrderService
+class OrderService
 {
     public function __construct(
-        TransactionOrder $orderModel,
+        Order $orderModel,
         Product $productModel,
         StoreStock $stockModel
     )
@@ -33,13 +33,13 @@ class TransactionOrderService
         return $this->orderModel->paginate($request->get('per_page', 10));
     }
 
-    public function get(Request $request, TransactionOrder $data)
+    public function get(Request $request, Order $data)
     {
         if (!$data) return null;
-        return $this->orderModel->where('transaction_orders.id', $data->id)->first();
+        return $this->orderModel->where('orders.id', $data->id)->first();
     }
 
-    public function create(TransactionOrderCreateRequest $request)
+    public function create(OrderCreateRequest $request)
     {
         $user = $request->user();
         $payload = $this->getPayloadItems($request);
@@ -60,7 +60,7 @@ class TransactionOrderService
         }
     }
 
-    private function getPayloadItems(TransactionOrderCreateRequest $request) {
+    private function getPayloadItems(OrderCreateRequest $request) {
         $user = $request->user();
         $products = $this->getProducts($request);
 
@@ -92,7 +92,7 @@ class TransactionOrderService
             $total += $subtotal;
 
             // Payload Create Order Item
-            $items->push(new TransactionOrderItem([
+            $items->push(new OrderItem([
                 'user_id' => $user->id,
                 'enterprise_id' => $user->enterprise_id,
                 'store_id' => $user->store_id,
@@ -108,7 +108,7 @@ class TransactionOrderService
         return collect(['items' => $items, 'total' => $total]);
     }
 
-    private function getProducts(TransactionOrderCreateRequest $request)
+    private function getProducts(OrderCreateRequest $request)
     {
         $productIds = $request->only('*.product_id')['*']['product_id'];
         return $this->productModel
@@ -126,7 +126,7 @@ class TransactionOrderService
 
     // This the former method,
     // not used due to sqlite does not support right join when testing
-    private function getProductUsingStock(TransactionOrderCreateRequest $request)
+    private function getProductUsingStock(OrderCreateRequest $request)
     {
         $user = $request->user();
         $productIds = $request->only('*.product_id')['*']['product_id'];

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Scopes\StoreScope;
 
-class TransactionOrderItem extends Model
+class OrderItem extends Model
 {
     use HasFactory;
 
@@ -15,7 +15,7 @@ class TransactionOrderItem extends Model
         'product_id',
         'store_id',
         'user_id',
-        'transaction_order_id',
+        'order_id',
         'amount',
         'subtotal',
     ];
@@ -47,6 +47,6 @@ class TransactionOrderItem extends Model
 
     public function order()
     {
-        return $this->belongsTo(TransactionOrder::class);
+        return $this->belongsTo(Order::class);
     }
 }

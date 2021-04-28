@@ -45,11 +45,11 @@ class Enterprise extends Model
 
     public function orders()
     {
-        return $this->hasMany(TransactionOrder::class);
+        return $this->hasMany(Order::class);
     }
 
     public function orderItems()
     {
-        return $this->hasMany(TransactionOrder::class);
+        return $this->hasMany(Order::class);
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTransactionOrdersTable extends Migration
+class CreateOrdersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateTransactionOrdersTable extends Migration
      */
     public function up()
     {
-        Schema::create('transaction_orders', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('enterprise_id')->constrained();
             $table->foreignId('store_id')->constrained();
@@ -30,6 +30,6 @@ class CreateTransactionOrdersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('transaction_orders');
+        Schema::dropIfExists('orders');
     }
 }

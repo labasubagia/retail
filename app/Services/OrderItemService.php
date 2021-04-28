@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\TransactionOrderItem;
+use App\Models\OrderItem;
 use App\Models\StoreStock;
 use Illuminate\Support\Arr;
 use Exception;
 
-class TransactionOrderItemService
+class OrderItemService
 {
     public function __construct(
-        TransactionOrderItem $itemModel,
+        OrderItem $itemModel,
         StoreStock $stockModel
     )
     {
@@ -18,7 +18,7 @@ class TransactionOrderItemService
         $this->stockModel = $stockModel;
     }
 
-    public function subtractStock(TransactionOrderItem $data)
+    public function subtractStock(OrderItem $data)
     {
         $filter = $data->only(['enterprise_id', 'store_id', 'product_id']);
         $amount =  (int)$data->amount;
