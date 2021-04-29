@@ -35,7 +35,7 @@ class EnterpriseTest extends TestCase
         Sanctum::actingAs($user);
         Enterprise::factory($count)->create();
         $this->assertDatabaseCount((new Enterprise)->getTable(), $count);
-        $response =$this->withHeaders(['Accept' => 'application/json'])
+        $response = $this->withHeaders(['Accept' => 'application/json'])
             ->get('/api/enterprise', ['per_page' => 10])
             ->assertOk()
             ->assertJsonPath('last_page', 2);
@@ -48,7 +48,7 @@ class EnterpriseTest extends TestCase
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/enterprise/1")
+            ->get('api/enterprise/1')
             ->assertUnauthorized();
     }
 
@@ -86,9 +86,10 @@ class EnterpriseTest extends TestCase
      * @group create
      * @group authentication
      */
-    public function testCreateUnauthenticated() {
+    public function testCreateUnauthenticated()
+    {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/enterprise/")
+            ->post('api/enterprise/')
             ->assertUnauthorized();
     }
 
@@ -103,7 +104,7 @@ class EnterpriseTest extends TestCase
         $enterprise = Enterprise::factory()->make();
         $payload = $enterprise->only($enterprise->getFillable());
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/enterprise/", $payload)
+            ->post('api/enterprise/', $payload)
             ->assertCreated();
         $this->assertDatabaseHas($enterprise->getTable(), $payload);
     }
@@ -115,7 +116,7 @@ class EnterpriseTest extends TestCase
     public function testUpdateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->put("api/enterprise/1")
+            ->put('api/enterprise/1')
             ->assertUnauthorized();
     }
 
@@ -150,7 +151,7 @@ class EnterpriseTest extends TestCase
             ->assertJsonPath('name', $name);
         $this->assertDatabaseHas($enterprise->getTable(), [
             'id' => $enterprise->id,
-            'name' => $name
+            'name' => $name,
         ]);
     }
 
@@ -161,7 +162,7 @@ class EnterpriseTest extends TestCase
     public function testDeleteUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->delete("api/enterprise/1")
+            ->delete('api/enterprise/1')
             ->assertUnauthorized();
     }
 

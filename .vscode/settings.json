@@ -1,7 +1,37 @@
 {
     "cSpell.words": [
         "Authenticatable",
+        "Autoload",
         "Laravel",
+        "autoloader",
+        "brainmaestro",
+        "brianium",
+        "cghooks",
+        "dont",
+        "fakerphp",
+        "fideloper",
+        "fqcn",
+        "friendsofphp",
+        "guzzlehttp",
+        "nunomaduro",
+        "paratest",
+        "phpdoc",
+        "phpunit",
+        "typehint",
+        "unsets",
         "upsert"
-    ]
+    ],
+    "emeraldwalk.runonsave": {
+        "autoClearConsole": true,
+        "commands": [
+            {
+                "match": "\\.php$",
+                "cmd": "${workspaceFolder}/vendor/bin/php-cs-fixer fix ${file}"
+            },
+            {
+                "match": ".php_cs",
+                "cmd": "${workspaceFolder}/vendor/bin/php-cs-fixer fix ${file}"
+            }
+        ]
+    }
 }

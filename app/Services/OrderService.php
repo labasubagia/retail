@@ -2,18 +2,15 @@
 
 namespace App\Services;
 
+use App\Http\Requests\OrderCreateRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\StoreStock;
 use App\Models\Product;
-use App\Scopes\StoreScope;
-use App\Scopes\EnterpriseScope;
-use App\Http\Requests\OrderCreateRequest;
+use App\Models\StoreStock;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Arr;
-use Exception;
 
 class OrderService
 {
@@ -21,8 +18,7 @@ class OrderService
         Order $orderModel,
         Product $productModel,
         StoreStock $stockModel
-    )
-    {
+    ) {
         $this->orderModel = $orderModel;
         $this->productModel = $productModel;
         $this->stockModel = $stockModel;
@@ -35,7 +31,9 @@ class OrderService
 
     public function get(Request $request, Order $data)
     {
-        if (!$data) return null;
+        if (! $data) {
+            return null;
+        }
         return $this->orderModel->where('orders.id', $data->id)->first();
     }
 
@@ -60,7 +58,8 @@ class OrderService
         }
     }
 
-    private function getPayloadItems(OrderCreateRequest $request) {
+    private function getPayloadItems(OrderCreateRequest $request)
+    {
         $user = $request->user();
         $products = $this->getProducts($request);
 
@@ -68,18 +67,17 @@ class OrderService
         $error = [];
         $total = 0;
 
-        foreach($request->all() as $index => $v) {
-
+        foreach ($request->all() as $index => $v) {
             $product = $products->where('id', $v['product_id'])->first();
             $amount = (int)$v['amount'];
 
             // Validation Stock
-            if (!$product){
+            if (! $product) {
                 $error["$index.product_id"] = 'does not exists';
                 continue;
             }
             if ($product->stock == null) {
-                $error["$index.amount"] = "stock does not available in this store";
+                $error["$index.amount"] = 'stock does not available in this store';
                 continue;
             }
             if ($product->stock < $amount) {
@@ -103,7 +101,9 @@ class OrderService
         }
 
         // Validate
-        if ($error) throw ValidationException::withMessages($error);
+        if ($error) {
+            throw ValidationException::withMessages($error);
+        }
 
         return collect(['items' => $items, 'total' => $total]);
     }

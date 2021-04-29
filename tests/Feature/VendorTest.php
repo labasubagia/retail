@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Vendor;
-use App\Models\User;
 use App\Models\Enterprise;
+use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -38,7 +38,7 @@ class VendorTest extends TestCase
         Sanctum::actingAs($user);
 
         $this->assertDatabaseCount('vendors', $count);
-        $response =$this->withHeaders(['Accept' => 'application/json'])
+        $response = $this->withHeaders(['Accept' => 'application/json'])
             ->get('/api/vendor', ['per_page' => 10])
             ->assertOk()
             ->assertJsonPath('last_page', 2);
@@ -51,10 +51,9 @@ class VendorTest extends TestCase
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/vendor/1")
+            ->get('api/vendor/1')
             ->assertUnauthorized();
     }
-
 
     /**
      * @group get
@@ -68,7 +67,7 @@ class VendorTest extends TestCase
             $vendor->getTable(),
             $vendor->only($vendor->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->get("api/vendor/$vendor->id");
 
@@ -85,7 +84,7 @@ class VendorTest extends TestCase
         // Employee of enterprise
         Sanctum::actingAs(User::factory()->create([
             'enterprise_id' => $vendor->enterprise_id,
-            'store_id' => null
+            'store_id' => null,
         ]));
         $fn()->assertOk();
     }
@@ -112,9 +111,10 @@ class VendorTest extends TestCase
      * @group create
      * @group authentication
      */
-    public function testCreateUnauthenticated() {
+    public function testCreateUnauthenticated()
+    {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/vendor/")
+            ->post('api/vendor/')
             ->assertUnauthorized();
     }
 
@@ -129,7 +129,7 @@ class VendorTest extends TestCase
         $vendor = Vendor::factory()->make(['enterprise_id' => $user->enterprise_id]);
         $payload = $vendor->only($vendor->getFillable());
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/vendor/", $payload)
+            ->post('api/vendor/', $payload)
             ->assertCreated();
         $this->assertDatabaseHas($vendor->getTable(), $payload);
     }
@@ -141,10 +141,9 @@ class VendorTest extends TestCase
     public function testUpdateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->put("api/vendor/1")
+            ->put('api/vendor/1')
             ->assertUnauthorized();
     }
-
 
     /**
      * @group update
@@ -158,7 +157,7 @@ class VendorTest extends TestCase
             $vendor->getTable(),
             $vendor->only($vendor->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->put("api/vendor/$vendor->id");
 
@@ -175,7 +174,7 @@ class VendorTest extends TestCase
         // Employee of enterprise
         Sanctum::actingAs(User::factory()->create([
             'enterprise_id' => $vendor->enterprise_id,
-            'store_id' => null
+            'store_id' => null,
         ]));
         $fn()->assertOk();
     }
@@ -196,7 +195,7 @@ class VendorTest extends TestCase
             ->assertJsonPath('name', $name);
         $this->assertDatabaseHas($vendor->getTable(), [
             'id' => $vendor->id,
-            'name' => $name
+            'name' => $name,
         ]);
     }
 
@@ -207,7 +206,7 @@ class VendorTest extends TestCase
     public function testDeleteUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->delete("api/vendor/1")
+            ->delete('api/vendor/1')
             ->assertUnauthorized();
     }
 
@@ -223,7 +222,7 @@ class VendorTest extends TestCase
             $vendor->getTable(),
             $vendor->only($vendor->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->delete("api/vendor/$vendor->id");
 
@@ -240,7 +239,7 @@ class VendorTest extends TestCase
         // Employee of enterprise
         Sanctum::actingAs(User::factory()->create([
             'enterprise_id' => $vendor->enterprise_id,
-            'store_id' => null
+            'store_id' => null,
         ]));
         $fn()->assertOk();
     }
@@ -259,5 +258,4 @@ class VendorTest extends TestCase
             ->assertOk();
         $this->assertDeleted($vendor);
     }
-
 }

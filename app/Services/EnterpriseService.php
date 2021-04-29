@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Enterprise;
 use App\Http\Requests\EnterpriseCreateRequest;
 use App\Http\Requests\EnterpriseUpdateRequest;
+use App\Models\Enterprise;
 use Illuminate\Http\Request;
 
 class EnterpriseService
@@ -32,14 +32,19 @@ class EnterpriseService
 
     public function update(EnterpriseUpdateRequest $request, Enterprise $data)
     {
-        if (!$data) return null;
+        if (! $data) {
+            return null;
+        }
         $payload = $request->only($data->getFillable());
         $data->update($payload);
         return $data;
     }
 
-    public function delete(Request $request, Enterprise $data) {
-        if(!$data) return null;
+    public function delete(Request $request, Enterprise $data)
+    {
+        if (! $data) {
+            return null;
+        }
         $data->delete();
         return $data;
     }

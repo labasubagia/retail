@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Enterprise;
 use App\Models\ProductType;
 use App\Models\User;
-use App\Models\Enterprise;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -38,7 +38,7 @@ class ProductTypeTest extends TestCase
         Sanctum::actingAs($user);
 
         $this->assertDatabaseCount((new ProductType)->getTable(), $count);
-        $response =$this->withHeaders(['Accept' => 'application/json'])
+        $response = $this->withHeaders(['Accept' => 'application/json'])
             ->get('/api/product-type', ['per_page' => 10])
             ->assertOk()
             ->assertJsonPath('last_page', 2);
@@ -51,7 +51,7 @@ class ProductTypeTest extends TestCase
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/product-type/1")
+            ->get('api/product-type/1')
             ->assertUnauthorized();
     }
 
@@ -67,7 +67,7 @@ class ProductTypeTest extends TestCase
             $productType->getTable(),
             $productType->only($productType->getFillable())
         );
-        $fn = fn() => $this->withHeaders(['Accept' => 'application/json'])
+        $fn = fn () => $this->withHeaders(['Accept' => 'application/json'])
             ->get("api/product-type/$productType->id");
 
         // Employee of other enterprise
@@ -76,7 +76,7 @@ class ProductTypeTest extends TestCase
 
         // Employee of enterprise store
         Sanctum::actingAs(User::factory()->create([
-            'enterprise_id' => $productType->enterprise_id
+            'enterprise_id' => $productType->enterprise_id,
         ]));
         $fn()->assertOk();
 
@@ -110,9 +110,10 @@ class ProductTypeTest extends TestCase
      * @group create
      * @group authentication
      */
-    public function testCreateUnauthenticated() {
+    public function testCreateUnauthenticated()
+    {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/product-type/")
+            ->post('api/product-type/')
             ->assertUnauthorized();
     }
 
@@ -127,7 +128,7 @@ class ProductTypeTest extends TestCase
         $productType = ProductType::factory()->make(['enterprise_id' => $user->enterprise_id]);
         $payload = $productType->only($productType->getFillable());
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/product-type/", $payload)
+            ->post('api/product-type/', $payload)
             ->assertCreated();
         $this->assertDatabaseHas($productType->getTable(), $payload);
     }
@@ -139,7 +140,7 @@ class ProductTypeTest extends TestCase
     public function testUpdateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->put("api/product-type/1")
+            ->put('api/product-type/1')
             ->assertUnauthorized();
     }
 
@@ -155,7 +156,7 @@ class ProductTypeTest extends TestCase
             $productType->getTable(),
             $productType->only($productType->getFillable())
         );
-        $fn = fn() => $this->withHeaders(['Accept' => 'application/json'])
+        $fn = fn () => $this->withHeaders(['Accept' => 'application/json'])
             ->put("api/product-type/$productType->id", ['name' => $this->faker->name]);
 
         // Employee of other enterprise
@@ -164,7 +165,7 @@ class ProductTypeTest extends TestCase
 
         // Employee of enterprise store
         Sanctum::actingAs(User::factory()->create([
-            'enterprise_id' => $productType->enterprise_id
+            'enterprise_id' => $productType->enterprise_id,
         ]));
         $fn()->assertForbidden();
 
@@ -192,7 +193,7 @@ class ProductTypeTest extends TestCase
             ->assertJsonPath('name', $name);
         $this->assertDatabaseHas($productType->getTable(), [
             'id' => $productType->id,
-            'name' => $name
+            'name' => $name,
         ]);
     }
 
@@ -203,7 +204,7 @@ class ProductTypeTest extends TestCase
     public function testDeleteUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->delete("api/product-type/1")
+            ->delete('api/product-type/1')
             ->assertUnauthorized();
     }
 
@@ -219,7 +220,7 @@ class ProductTypeTest extends TestCase
             $productType->getTable(),
             $productType->only($productType->getFillable())
         );
-        $fn = fn() => $this->withHeaders(['Accept' => 'application/json'])
+        $fn = fn () => $this->withHeaders(['Accept' => 'application/json'])
             ->delete("api/product-type/$productType->id");
 
         // Employee of other enterprise
@@ -228,7 +229,7 @@ class ProductTypeTest extends TestCase
 
         // Employee of enterprise store
         Sanctum::actingAs(User::factory()->create([
-            'enterprise_id' => $productType->enterprise_id
+            'enterprise_id' => $productType->enterprise_id,
         ]));
         $fn()->assertForbidden();
 
@@ -254,5 +255,4 @@ class ProductTypeTest extends TestCase
             ->assertOk();
         $this->assertDeleted($productType);
     }
-
 }

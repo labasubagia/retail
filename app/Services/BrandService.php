@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Brand;
 use App\Http\Requests\BrandCreateRequest;
 use App\Http\Requests\BrandUpdateRequest;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 
 class BrandService
@@ -35,14 +35,19 @@ class BrandService
 
     public function update(BrandUpdateRequest $request, Brand $data)
     {
-        if (!$data) return null;
+        if (! $data) {
+            return null;
+        }
         $payload = $request->only($data->getFillable());
         $data->update($payload);
         return $data;
     }
 
-    public function delete(Request $request, Brand $data) {
-        if(!$data) return null;
+    public function delete(Request $request, Brand $data)
+    {
+        if (! $data) {
+            return null;
+        }
         $data->delete();
         return $data;
     }

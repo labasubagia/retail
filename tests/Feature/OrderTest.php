@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Enterprise;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\User;
-use App\Models\Enterprise;
 use App\Models\Product;
 use App\Models\StoreStock;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -56,7 +56,7 @@ class OrderTest extends TestCase
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/order/1")
+            ->get('api/order/1')
             ->assertUnauthorized();
     }
 
@@ -72,7 +72,7 @@ class OrderTest extends TestCase
             $order->getTable(),
             $order->only($order->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->get("api/order/$order->id");
 
@@ -113,9 +113,10 @@ class OrderTest extends TestCase
             ->assertOk();
     }
 
-    public function testCreateUnauthenticated() {
+    public function testCreateUnauthenticated()
+    {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/order/")
+            ->post('api/order/')
             ->assertUnauthorized();
     }
 
@@ -124,17 +125,18 @@ class OrderTest extends TestCase
      * @group authorization
      * @group authentication
      */
-    public function testCreateAuthorization() {
+    public function testCreateAuthorization()
+    {
         // Not Employee
-        Sanctum::actingAs(User::factory()->create(['enterprise_id' => null,'store_id' => null]));
+        Sanctum::actingAs(User::factory()->create(['enterprise_id' => null, 'store_id' => null]));
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/order/")
+            ->post('api/order/')
             ->assertForbidden();
 
         // Enterprise Employee
         Sanctum::actingAs(User::factory()->create(['store_id' => null]));
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/order/")
+            ->post('api/order/')
             ->assertForbidden();
     }
 
@@ -157,30 +159,31 @@ class OrderTest extends TestCase
         $count = 2;
         $product = Product::factory($count)
             ->create($enterprisePayload)
-            ->each(function($p) use ($storePayload, $stock, &$stocks) {
-                $stocks->push(StoreStock::factory()
+            ->each(function ($p) use ($storePayload, $stock, &$stocks) {
+                $stocks->push(
+                    StoreStock::factory()
                     ->create(
-                        array_merge($storePayload, ['product_id' => $p->id, 'stock' => $stock ])
+                        array_merge($storePayload, ['product_id' => $p->id, 'stock' => $stock])
                     )
                 );
             });
 
         // Send Request
-        $payload = $product->map(fn($p) => ['product_id' => $p->id, 'amount' => $buy])->toArray();
-        $response = $this->withHeaders(['Accept' => 'application/json'])->post("api/order/", $payload);
+        $payload = $product->map(fn ($p) => ['product_id' => $p->id, 'amount' => $buy])->toArray();
+        $response = $this->withHeaders(['Accept' => 'application/json'])->post('api/order/', $payload);
         $result = collect(json_decode($response->getContent()))->except('trace');
         $response->assertCreated();
 
         // Check Stock
         $stocks = StoreStock::whereIn('id', $stocks->pluck('id'))->get();
-        $isQuantityCorrect = $stocks->every(fn($s) => $s->stock == $stock - $buy);
+        $isQuantityCorrect = $stocks->every(fn ($s) => $s->stock == $stock - $buy);
         $this->assertTrue($isQuantityCorrect);
         $this->assertDatabaseCount((new StoreStock)->getTable(), $count);
 
         // Check Database
         $this->assertDatabaseHas((new Order)->getTable(), [
             'id' => $result->get('id'),
-            'total' => $result->get('total')
+            'total' => $result->get('total'),
         ]);
         $this->assertDatabaseCount((new OrderItem)->getTable(), count($stocks));
     }

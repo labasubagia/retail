@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Scopes\EnterpriseScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Scopes\EnterpriseScope;
 
 class Store extends Model
 {
@@ -43,7 +43,10 @@ class Store extends Model
     public function products()
     {
         return $this->belongsToMany(
-            Product::class, (new StoreStock)->getTable(), 'store_id', 'product_id'
+            Product::class,
+            (new StoreStock)->getTable(),
+            'store_id',
+            'product_id'
         );
     }
 }

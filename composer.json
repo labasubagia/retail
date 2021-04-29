@@ -14,9 +14,11 @@
         "laravel/tinker": "^2.5"
     },
     "require-dev": {
+        "brainmaestro/composer-git-hooks": "^2.8",
         "brianium/paratest": "^6.2",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
+        "friendsofphp/php-cs-fixer": "^2.18",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
@@ -35,6 +37,7 @@
         }
     },
     "scripts": {
+        "cghooks": "vendor/bin/cghooks",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -44,11 +47,27 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ]
+        ],
+        "post-install-cmd": "cghooks add --ignore-lock",
+        "post-update-cmd": "cghooks update"
     },
     "extra": {
         "laravel": {
             "dont-discover": []
+        },
+        "hooks": {
+            "config": {
+                "stop-on-failure": ["pre-push"]
+            },
+            "pre-commit": [
+                "echo committing as $(git config user.email)",
+                "php-cs-fixer fix ."
+            ],
+            "pre-push": [
+                "php-cs-fixer fix --dry-run --stop-on-violation .",
+                "phpunit"
+            ],
+            "post-merge": "composer-update"
         }
     },
     "config": {

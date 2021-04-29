@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Vendor;
 use App\Http\Requests\VendorCreateRequest;
 use App\Http\Requests\VendorUpdateRequest;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 
 class VendorService
@@ -35,14 +35,19 @@ class VendorService
 
     public function update(VendorUpdateRequest $request, Vendor $data)
     {
-        if (!$data) return null;
+        if (! $data) {
+            return null;
+        }
         $payload = $request->only($data->getFillable());
         $data->update($payload);
         return $data;
     }
 
-    public function delete(Request $request, Vendor $data) {
-        if(!$data) return null;
+    public function delete(Request $request, Vendor $data)
+    {
+        if (! $data) {
+            return null;
+        }
         $data->delete();
         return $data;
     }

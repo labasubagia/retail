@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Brand;
-use App\Models\User;
 use App\Models\Enterprise;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -51,7 +51,7 @@ class BrandTest extends TestCase
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/brand/1")
+            ->get('api/brand/1')
             ->assertUnauthorized();
     }
 
@@ -67,7 +67,7 @@ class BrandTest extends TestCase
             $brand->getTable(),
             $brand->only($brand->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->get("api/brand/$brand->id");
 
@@ -77,7 +77,7 @@ class BrandTest extends TestCase
 
         // Employee of enterprise
         Sanctum::actingAs(User::factory()->create([
-            'enterprise_id' => $brand->enterprise_id
+            'enterprise_id' => $brand->enterprise_id,
         ]));
         $fn()->assertOk();
     }
@@ -104,9 +104,10 @@ class BrandTest extends TestCase
      * @group create
      * @group authentication
      */
-    public function testCreateUnauthenticated() {
+    public function testCreateUnauthenticated()
+    {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/brand/")
+            ->post('api/brand/')
             ->assertUnauthorized();
     }
 
@@ -121,7 +122,7 @@ class BrandTest extends TestCase
         $payload = $brand->only('name');
         Sanctum::actingAs($user);
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/brand/", $payload)
+            ->post('api/brand/', $payload)
             ->assertCreated();
         $this->assertDatabaseHas($brand->getTable(), $payload);
     }
@@ -133,7 +134,7 @@ class BrandTest extends TestCase
     public function testUpdateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->put("api/brand/1", ['name' => $this->faker->name])
+            ->put('api/brand/1', ['name' => $this->faker->name])
             ->assertUnauthorized();
     }
 
@@ -149,7 +150,7 @@ class BrandTest extends TestCase
             $brand->getTable(),
             $brand->only($brand->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->put("api/brand/$brand->id", ['name' => $this->faker->name]);
 
@@ -159,7 +160,7 @@ class BrandTest extends TestCase
 
         // Employee of enterprise store
         Sanctum::actingAs(User::factory()->create([
-            'enterprise_id' => $brand->enterprise_id
+            'enterprise_id' => $brand->enterprise_id,
         ]));
         $fn()->assertForbidden();
 
@@ -187,7 +188,7 @@ class BrandTest extends TestCase
             ->assertJsonPath('name', $name);
         $this->assertDatabaseHas($brand->getTable(), [
             'id' => $brand->id,
-            'name' => $name
+            'name' => $name,
         ]);
     }
 
@@ -198,7 +199,7 @@ class BrandTest extends TestCase
     public function testDeleteUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->delete("api/brand/1")
+            ->delete('api/brand/1')
             ->assertUnauthorized();
     }
 
@@ -214,7 +215,7 @@ class BrandTest extends TestCase
             $brand->getTable(),
             $brand->only($brand->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->delete("api/brand/$brand->id");
 
@@ -250,5 +251,4 @@ class BrandTest extends TestCase
             ->assertOk();
         $this->assertDeleted($brand);
     }
-
 }

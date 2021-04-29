@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Enterprise;
-use App\Models\Store;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EnterpriseFactory extends Factory

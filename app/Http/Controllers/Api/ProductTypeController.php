@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductTypeCreateRequest;
 use App\Http\Requests\ProductTypeUpdateRequest;
-use App\Services\ProductTypeService;
 use App\Models\ProductType;
+use App\Services\ProductTypeService;
 use Illuminate\Http\Request;
 
 class ProductTypeController extends Controller
 {
-
     public function __construct(ProductTypeService $service)
     {
         $this->authorizeResource(ProductType::class, 'product_type');

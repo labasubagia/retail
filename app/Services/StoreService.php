@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Store;
 use App\Http\Requests\StoreCreateRequest;
 use App\Http\Requests\StoreUpdateRequest;
+use App\Models\Store;
 use Illuminate\Http\Request;
 
 class StoreService
@@ -35,14 +35,19 @@ class StoreService
 
     public function update(StoreUpdateRequest $request, Store $data)
     {
-        if (!$data) return null;
+        if (! $data) {
+            return null;
+        }
         $payload = $request->only($data->getFillable());
         $data->update($payload);
         return $data;
     }
 
-    public function delete(Request $request, Store $data) {
-        if(!$data) return null;
+    public function delete(Request $request, Store $data)
+    {
+        if (! $data) {
+            return null;
+        }
         $data->delete();
         return $data;
     }

@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BrandCreateRequest;
 use App\Http\Requests\BrandUpdateRequest;
-use App\Services\BrandService;
 use App\Models\Brand;
+use App\Services\BrandService;
 use Illuminate\Http\Request;
 
 class BrandController extends Controller

@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Product;
 use App\Http\Requests\ProductCreateRequest;
 use App\Http\Requests\ProductUpdateRequest;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductService
@@ -38,14 +38,19 @@ class ProductService
 
     public function update(ProductUpdateRequest $request, Product $data)
     {
-        if (!$data) return null;
+        if (! $data) {
+            return null;
+        }
         $payload = $request->only($data->getFillable());
         $data->update($payload);
         return $data;
     }
 
-    public function delete(Request $request, Product $data) {
-        if(!$data) return null;
+    public function delete(Request $request, Product $data)
+    {
+        if (! $data) {
+            return null;
+        }
         $data->delete();
         return $data;
     }

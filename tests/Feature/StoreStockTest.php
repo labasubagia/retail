@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\StoreStock;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -21,7 +20,7 @@ class StoreStockTest extends TestCase
     public function testUpsertUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/store-stock/")
+            ->post('api/store-stock/')
             ->assertUnauthorized();
     }
 
@@ -41,10 +40,10 @@ class StoreStockTest extends TestCase
             'product_id' => $storeStock->product_id,
             'stock' => $this->faker->numberBetween(10, 50),
         ];
-        $fnCreate = fn() => $this
+        $fnCreate = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
-            ->post("api/store-stock", $payload);
-        $fnUpdate = fn() => $this
+            ->post('api/store-stock', $payload);
+        $fnUpdate = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->post("api/store-stock/$storeStock->id", $payload);
 
@@ -88,7 +87,7 @@ class StoreStockTest extends TestCase
         ];
         $this->assertDatabaseCount($storeStock->getTable(), 0);
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/store-stock", $payload)
+            ->post('api/store-stock', $payload)
             ->assertOk()
             ->assertJsonFragment($payload);
         $this->assertDatabaseHas($storeStock->getTable(), $payload);
@@ -113,7 +112,7 @@ class StoreStockTest extends TestCase
         ];
         $this->assertDatabaseCount($storeStock->getTable(), 1);
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/store-stock", $payload)
+            ->post('api/store-stock', $payload)
             ->assertOk()
             ->assertJsonFragment($payload);
         $this->assertDatabaseHas($storeStock->getTable(), $payload);

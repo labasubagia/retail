@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\TypeCreate;
 
 class ProductTypeCreateRequest extends FormRequest
 {

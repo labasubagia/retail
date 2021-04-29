@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -42,7 +41,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-
     public function enterprise()
     {
         return $this->belongsTo(Enterprise::class);
@@ -65,12 +63,12 @@ class User extends Authenticatable
 
     public function getIsNotEmployeeAttribute()
     {
-        return !$this->enterprise_id && !$this->store_id;
+        return ! $this->enterprise_id && ! $this->store_id;
     }
 
     public function getIsOnlyEnterpriseEmployeeAttribute()
     {
-        return $this->enterprise_id && !$this->store_id;
+        return $this->enterprise_id && ! $this->store_id;
     }
 
     public function getIsStoreEmployeeAttribute()

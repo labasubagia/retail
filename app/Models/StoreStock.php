@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Scopes\StoreScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Scopes\StoreScope;
 
 class StoreStock extends Model
 {
@@ -41,5 +41,4 @@ class StoreStock extends Model
     {
         return $this->belongsTo(Store::class);
     }
-
 }

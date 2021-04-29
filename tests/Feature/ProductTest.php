@@ -2,12 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Product;
-use App\Models\ProductType;
-use App\Models\Brand;
-use App\Models\Vendor;
-use App\Models\User;
 use App\Models\Enterprise;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -56,7 +53,7 @@ class ProductTest extends TestCase
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/product/1")
+            ->get('api/product/1')
             ->assertUnauthorized();
     }
 
@@ -72,14 +69,14 @@ class ProductTest extends TestCase
             $product->getTable(),
             $product->only($product->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->get("api/product/$product->id");
 
         // Employee of this enterprise
         Sanctum::actingAs(User::factory()->create([
             'enterprise_id' => $product->enterprise_id,
-            'store_id' => null
+            'store_id' => null,
         ]));
         $fn()->assertOk();
 
@@ -109,9 +106,10 @@ class ProductTest extends TestCase
      * @group create
      * @group authentication
      */
-    public function testCreateUnauthenticated() {
+    public function testCreateUnauthenticated()
+    {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/product/")
+            ->post('api/product/')
             ->assertUnauthorized();
     }
 
@@ -128,7 +126,7 @@ class ProductTest extends TestCase
         ]);
         $payload = $product->only($product->getFillable());
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/product/", $payload)
+            ->post('api/product/', $payload)
             ->assertCreated();
         $this->assertDatabaseHas($product->getTable(), $payload);
     }
@@ -140,7 +138,7 @@ class ProductTest extends TestCase
     public function testUpdateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->put("api/product/1", ['name' => 'random'])
+            ->put('api/product/1', ['name' => 'random'])
             ->assertUnauthorized();
     }
 
@@ -157,7 +155,7 @@ class ProductTest extends TestCase
             $product->only($product->getFillable())
         );
         $payload = ['name' => $this->faker->name];
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->put("api/product/$product->id", $payload);
 
@@ -174,7 +172,7 @@ class ProductTest extends TestCase
         // Employee of enterprise
         Sanctum::actingAs(User::factory()->create([
             'enterprise_id' => $product->enterprise_id,
-            'store_id' => null
+            'store_id' => null,
         ]));
         $fn()->assertOk();
     }
@@ -195,7 +193,7 @@ class ProductTest extends TestCase
             ->assertJsonPath('name', $name);
         $this->assertDatabaseHas($product->getTable(), [
             'id' => $product->id,
-            'name' => $name
+            'name' => $name,
         ]);
     }
 
@@ -206,7 +204,7 @@ class ProductTest extends TestCase
     public function testDeleteUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->delete("api/product/1")
+            ->delete('api/product/1')
             ->assertUnauthorized();
     }
 
@@ -222,7 +220,7 @@ class ProductTest extends TestCase
             $product->getTable(),
             $product->only($product->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->delete("api/product/$product->id");
 
@@ -239,7 +237,7 @@ class ProductTest extends TestCase
         // Employee of enterprise
         Sanctum::actingAs(User::factory()->create([
             'enterprise_id' => $product->enterprise_id,
-            'store_id' => null
+            'store_id' => null,
         ]));
         $fn()->assertOk();
     }

@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\OrderItem;
-use App\Models\Order;
 use App\Models\Enterprise;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class OrderItemFactory extends Factory
 {
@@ -33,9 +33,7 @@ class OrderItemFactory extends Factory
             'user_id' => User::factory(),
             'order_id' => Order::factory(),
             'amount' => $this->faker->numberBetween(1, 5),
-            'subtotal' => function (array $attributes) {
-                return Product::find($attributes['product_id'])->price * $attributes['amount'];
-            }
+            'subtotal' => fn (array $attributes) => Product::find($attributes['product_id'])->price * $attributes['amount'],
         ];
     }
 }

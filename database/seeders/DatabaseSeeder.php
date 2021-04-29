@@ -2,22 +2,19 @@
 
 namespace Database\Seeders;
 
-
-use App\Models\Enterprise;
-use App\Models\User;
 use App\Models\Brand;
-use App\Models\Vendor;
+use App\Models\Enterprise;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Store;
 use App\Models\StoreStock;
-use App\Models\Order;
-use App\Models\OrderItem;
-use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Factories\Sequence;
-use Illuminate\Support\Arr;
+use Illuminate\Database\Seeder;
 use Laravel\Sanctum\Sanctum;
-
 
 class DatabaseSeeder extends Seeder
 {
@@ -39,13 +36,13 @@ class DatabaseSeeder extends Seeder
 
         Enterprise::factory(2)
             ->create()
-            ->each(function($enterprise) {
+            ->each(function ($enterprise) {
                 $payload = ['enterprise_id' => $enterprise->id];
                 $brands = Brand::factory(5)->create($payload);
                 $vendors = Vendor::factory(5)->create($payload);
                 $types = ProductType::factory(5)->create($payload);
                 $products = Product::factory(10)
-                    ->state(new Sequence(fn() => [
+                    ->state(new Sequence(fn () => [
                         'brand_id' => $brands->random()->id,
                         'vendor_id' => $vendors->random()->id,
                         'product_type_id' => $vendors->random()->id,
@@ -62,7 +59,7 @@ class DatabaseSeeder extends Seeder
 
                 Store::factory(2)
                     ->create(['enterprise_id' => $enterprise->id])
-                    ->each(function($store) use ($products) {
+                    ->each(function ($store) use ($products) {
                         $payload = [
                             'enterprise_id' => $store->enterprise_id,
                             'store_id' => $store->id,
@@ -71,21 +68,22 @@ class DatabaseSeeder extends Seeder
                         // Store Employees
                         $users = User::factory(2)->create($payload);
 
-                        $products->each(fn($product) =>
-                            StoreStock::factory()->create(array_merge(
-                                $payload, [
+                        $products->each(
+                            fn ($product) => StoreStock::factory()->create(array_merge(
+                                $payload,
+                                [
                                     'product_id' => $product->id,
                                 ]
                             ))
                         );
 
                         Order::factory(10)
-                            ->state(new Sequence(fn() => ['user_id' => $users->random()->id]))
+                            ->state(new Sequence(fn () => ['user_id' => $users->random()->id]))
                             ->create($payload)
                             ->each(function ($order) use ($products) {
                                 OrderItem::factory()
-                                    ->state(new Sequence(fn() => [
-                                        'product_id' => $products->random()->id
+                                    ->state(new Sequence(fn () => [
+                                        'product_id' => $products->random()->id,
                                     ]))
                                     ->create([
                                         'enterprise_id' => $order->enterprise_id,

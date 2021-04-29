@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Models\OrderItem;
 use App\Services\OrderItemService;
-use Illuminate\Support\Arr;
 
 class OrderItemObserver
 {

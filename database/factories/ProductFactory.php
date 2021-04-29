@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\Product;
-use App\Models\Enterprise;
 use App\Models\Brand;
-use App\Models\Vendor;
+use App\Models\Enterprise;
+use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory

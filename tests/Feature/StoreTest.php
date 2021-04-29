@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Enterprise;
 use App\Models\Store;
 use App\Models\User;
-use App\Models\Enterprise;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -38,7 +38,7 @@ class StoreTest extends TestCase
         Sanctum::actingAs($user);
 
         $this->assertDatabaseCount('stores', $count);
-        $response =$this->withHeaders(['Accept' => 'application/json'])
+        $response = $this->withHeaders(['Accept' => 'application/json'])
             ->get('/api/store', ['per_page' => 10])
             ->assertOk()
             ->assertJsonPath('last_page', 2);
@@ -51,7 +51,7 @@ class StoreTest extends TestCase
     public function testGetUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->get("api/store/1")
+            ->get('api/store/1')
             ->assertUnauthorized();
     }
 
@@ -66,7 +66,7 @@ class StoreTest extends TestCase
             $store->getTable(),
             $store->only($store->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->get("api/store/$store->id");
 
@@ -76,7 +76,7 @@ class StoreTest extends TestCase
 
         // Employee of enterprise store
         Sanctum::actingAs(User::factory()->create([
-            'enterprise_id' => $store->enterprise_id
+            'enterprise_id' => $store->enterprise_id,
         ]));
         $fn()->assertForbidden();
 
@@ -109,9 +109,10 @@ class StoreTest extends TestCase
      * @group create
      * @group authentication
      */
-    public function testCreateUnauthenticated() {
+    public function testCreateUnauthenticated()
+    {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/store/")
+            ->post('api/store/')
             ->assertUnauthorized();
     }
 
@@ -126,7 +127,7 @@ class StoreTest extends TestCase
         $store = Store::factory()->make(['enterprise_id' => $user->enterprise_id]);
         $payload = $store->only($store->getFillable());
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post("api/store/", $payload)
+            ->post('api/store/', $payload)
             ->assertCreated();
         $this->assertDatabaseHas($store->getTable(), $payload);
     }
@@ -138,7 +139,7 @@ class StoreTest extends TestCase
     public function testUpdateUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->put("api/store/1")
+            ->put('api/store/1')
             ->assertUnauthorized();
     }
 
@@ -154,7 +155,7 @@ class StoreTest extends TestCase
             $store->getTable(),
             $store->only($store->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->put("api/store/$store->id");
 
@@ -164,7 +165,7 @@ class StoreTest extends TestCase
 
         // Employee of enterprise store
         Sanctum::actingAs(User::factory()->create([
-            'enterprise_id' => $store->enterprise_id
+            'enterprise_id' => $store->enterprise_id,
         ]));
         $fn()->assertForbidden();
 
@@ -192,7 +193,7 @@ class StoreTest extends TestCase
             ->assertJsonPath('name', $name);
         $this->assertDatabaseHas($store->getTable(), [
             'id' => $store->id,
-            'name' => $name
+            'name' => $name,
         ]);
     }
 
@@ -203,7 +204,7 @@ class StoreTest extends TestCase
     public function testDeleteUnauthenticated()
     {
         $this->withHeaders(['Accept' => 'application/json'])
-            ->delete("api/store/1")
+            ->delete('api/store/1')
             ->assertUnauthorized();
     }
 
@@ -219,7 +220,7 @@ class StoreTest extends TestCase
             $store->getTable(),
             $store->only($store->getFillable())
         );
-        $fn = fn() => $this
+        $fn = fn () => $this
             ->withHeaders(['Accept' => 'application/json'])
             ->put("api/store/$store->id");
 
@@ -229,7 +230,7 @@ class StoreTest extends TestCase
 
         // Employee of enterprise store
         Sanctum::actingAs(User::factory()->create([
-            'enterprise_id' => $store->enterprise_id
+            'enterprise_id' => $store->enterprise_id,
         ]));
         $fn()->assertForbidden();
 
@@ -255,5 +256,4 @@ class StoreTest extends TestCase
             ->assertOk();
         $this->assertDeleted($store);
     }
-
 }

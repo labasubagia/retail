@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreStockUpsertRequest;
 use App\Models\StoreStock;
 use App\Services\StoreStockService;
-use Illuminate\Http\Request;
 
 class StoreStockController extends Controller
 {

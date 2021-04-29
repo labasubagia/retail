@@ -3,12 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Models\Enterprise;
-use App\Models\Store;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
@@ -35,9 +33,9 @@ class AuthTest extends TestCase
     public function testRegisterSuccess()
     {
         $user = User::factory()->make();
-        $payload = $user->only('name','email');
+        $payload = $user->only('name', 'email');
         $this->withHeaders(['Accept' => 'application/json'])
-            ->post('api/auth/register', array_merge($payload,[
+            ->post('api/auth/register', array_merge($payload, [
                 'password' => '12345678',
             ]))
             ->assertCreated();

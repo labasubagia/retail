@@ -25,7 +25,7 @@ class StoreUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'string|max:255'
+            'name' => 'string|max:255',
         ];
     }
 }

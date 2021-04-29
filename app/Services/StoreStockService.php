@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\StoreStock;
 use App\Http\Requests\StoreStockUpsertRequest;
-use Illuminate\Http\Request;
+use App\Models\StoreStock;
 use Illuminate\Support\Arr;
 
 class StoreStockService

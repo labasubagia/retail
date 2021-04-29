@@ -10,7 +10,6 @@ class StoreStockPolicy
 {
     use HandlesAuthorization;
 
-
     public function create(User $user)
     {
         return $user->isStoreEmployee;
