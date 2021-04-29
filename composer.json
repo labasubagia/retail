@@ -38,6 +38,7 @@
     },
     "scripts": {
         "cghooks": "vendor/bin/cghooks",
+        "php-cs-fixer": "vendor/bin/php-cs-fixer",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -60,13 +61,12 @@
                 "stop-on-failure": ["pre-push"]
             },
             "pre-commit": [
-                "echo committing as $(git config user.email)",
-                "php-cs-fixer fix ."
+                "echo Committing as $(git config user.email)",
+                "vendor/bin/php-cs-fixer fix ."
             ],
-            "commit-msg": "grep -q '[A-Z]+-[0-9]+.*' $1",
             "pre-push": [
-                "php-cs-fixer fix --dry-run --stop-on-violation .",
-                "phpunit"
+                "vendor/bin/php-cs-fixer fix --dry-run --stop-on-violation .",
+                "php artisan test --parallel"
             ],
             "post-merge": "composer-update"
         }
